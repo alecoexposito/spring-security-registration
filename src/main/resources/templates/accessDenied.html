@@ -1,0 +1,22 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>
+    <title th:utext="#{label.pages.accessDenied.title}">access denied</title>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a sec:authorize="hasRole('ADMIN')" class="navbar-brand" th:href="@{/console}"
+               th:utext="#{label.pages.home.title}">home</a>
+            <a sec:authorize="!hasRole('ADMIN')" class="navbar-brand" th:href="@{/homepage.html}"
+               th:utext="#{label.pages.home.title}">home</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 th:utext="#{label.pages.accessDenied.message}">This page is not for you</h1>
+</div>
+</body>
+</html>
