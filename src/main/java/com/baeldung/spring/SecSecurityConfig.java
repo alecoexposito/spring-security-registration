@@ -1,6 +1,7 @@
 package com.baeldung.spring;
 
 import com.baeldung.persistence.dao.UserRepository;
+import com.baeldung.security.CustomAccessDeniedHandler;
 import com.baeldung.security.CustomRememberMeServices;
 import com.baeldung.security.google2fa.CustomAuthenticationProvider;
 import com.baeldung.security.google2fa.CustomWebAuthenticationDetailsSource;
@@ -59,6 +60,9 @@ public class SecSecurityConfig {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
+
 
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
@@ -82,12 +86,14 @@ public class SecSecurityConfig {
                 .antMatchers(HttpMethod.GET, "/roleHierarchy")
                 .hasRole("STAFF")
             .antMatchers("/login*", "/logout*", "/signin/**", "/signup/**", "/customLogin", "/user/registration*", "/registrationConfirm*", "/expiredAccount*", "/registration*", "/badUser*", "/user/resendRegistrationToken*", "/forgetPassword*",
-                "/user/resetPassword*", "/user/savePassword*", "/updatePassword*", "/user/changePassword*", "/emailError*", "/resources/**", "/old/user/registration*", "/successRegister*", "/qrcode*", "/user/enableNewLoc*")
+                "/user/resetPassword*", "/user/savePassword*", "/updatePassword*", "/user/changePassword*", "/emailError*", "/resources/**", "/old/user/registration*", "/successRegister*", "/qrcode*", "/user/enableNewLoc*", "/accessDenied*")
             .permitAll()
             .antMatchers("/invalidSession*")
             .anonymous()
             .antMatchers("/user/updatePassword*")
             .hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
+            .antMatchers("/management*")
+            .hasRole("MANAGER")
             .anyRequest()
             .hasAuthority("READ_PRIVILEGE")
             .and()
@@ -108,6 +114,9 @@ public class SecSecurityConfig {
             .sessionFixation()
             .none()
             .and()
+            .exceptionHandling()
+            .accessDeniedHandler(customAccessDeniedHandler)
+            .and()
             .logout()
             .logoutSuccessHandler(myLogoutSuccessHandler)
             .invalidateHttpSession(true)
@@ -117,6 +126,7 @@ public class SecSecurityConfig {
             .and()
             .rememberMe()
             .rememberMeServices(rememberMeServices())
+
             .key("theKey");
         return http.build();
     }
