@@ -27,6 +27,9 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     }
 
     public String getUsername(Authentication authentication) {
-        return ((User) authentication.getPrincipal()).getEmail();
+        if (authentication.getPrincipal() instanceof User) {
+            return ((User) authentication.getPrincipal()).getEmail();
+        }
+        return authentication.getName();
     }
 }
